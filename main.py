@@ -4,10 +4,13 @@ import csv
 import sys
 import pandas as pandas
 import random
+import numpy as np
 import re
+from scipy.spatial import distance
+from sklearn.metrics import jaccard_score
 from itertools import chain
 
-INGR_COUNT = 8022
+INGR_COUNT = 8023
 
 def standardize(vector):
     result = []
@@ -16,9 +19,15 @@ def standardize(vector):
     return result
 
 
+class Similarity:
+    def __init__(self, recipe_id, value):
+        self.recipe_id = recipe_id
+        self.value = value
+
+
 class Recipe:
-  def __init__(self, name, ingr_vector):
-      self.name = name
+  def __init__(self, id, ingr_vector):
+      self.id = id
       self.ingr_vector = ingr_vector
 
   def get_vector(self):
@@ -34,29 +43,31 @@ class User:
 
 
 
-def user_vector(recipes):
-    print('test')
+def jaccard_similarity(v1, v2):
+    return jaccard_score(v1, v2)
 
 
-def jaccard_index(vector_1, vector_2):
-    print('test')
-
-def jaccard_get5(user_recipes, db_recipes):
-    pass
-
-def hamming_distance(vector_1, vector_2):
-    print('test')
+def hamming_distance(v1, v2):
+    return distance.hamming(v1, v2)
 
 
-def cossine_distance(vector_1, vector_2):
-    print('test')
+def get5_by_method(user_vector, db_recipes, method):
+    jaccard_list = []
+    c = 0
+    for db in db_recipes:
+        obj = Similarity(db.id, method(db.ingr_vector, user_vector))
+        jaccard_list.append(obj)
+        print(c)
+        c += 1
+    jaccard_list.sort(key=lambda v: v.value, reverse=True)
+    return jaccard_list
 
 
-def pearson_cor(vector_1, vector_2):
-    print('test')
+def cossine_distance(v1, v2):
+    return distance.cosine(v1, v2)
 
 
-def kulczynski(vector_1, vector_2):
+def kulzinsky(vector_1, vector_2):
     print('test')
 
 
@@ -81,6 +92,13 @@ def get_recipe_ingr_from_db(con, id):
     return ingredients_ids
 
 
+def select_all_recipe_ingr_ids(con):
+    cur = con.cursor()
+    #  fixme momentalne vyberam mensiu vzorku receptov kvoli debugu
+    ingredients_ids = cur.execute(f"SELECT id, ingredient_ids FROM PP_RECIPES").fetchmany(5000)
+    return ingredients_ids
+
+
 def get_recipe_ids_from_db(con):
     cur = con.cursor()
     ids = cur.execute(f"SELECT id FROM PP_RECIPES").fetchall()
@@ -88,13 +106,17 @@ def get_recipe_ids_from_db(con):
 
 
 def get_all_recipes(con):
-    recipe_ids = get_recipe_ids_from_db(con)
     all_recipes = []
-    c = 0
-    for r_id in recipe_ids:
-        ingrs = string_to_ingredient_ids(get_recipe_ingr_from_db(con, r_id)[0])
-        all_recipes.append(Recipe(f'Recipe number: {r_id}', ingrs))
-        c += 1
+    recipe_ingrs_coll = select_all_recipe_ingr_ids(con)
+    for rec in recipe_ingrs_coll:
+        ingr_ids = string_to_ingredient_ids(rec[1])
+        recipe_vector = [0] * INGR_COUNT
+        for i in ingr_ids:
+            try:
+                recipe_vector[i] = 1
+            except IndexError:
+                print(f"{i}")
+        all_recipes.append(Recipe(rec[0], recipe_vector))
     return all_recipes
 
 
@@ -120,24 +142,26 @@ if __name__ == '__main__':
         ingredient_ids = pickle.load(p_f).id.unique()
 
     recipe_ids = get_recipe_ids_from_db(con)
-    user_recipe_choice = random.sample(list(recipe_ids), 5)  # random recipes
-    ingr_vectors = []
-    for x in user_recipe_choice:
-        ingr_vectors.append(get_recipe_ingr_from_db(con, x))
-    ingr_vectors = [x[0] for x in ingr_vectors]
+    user_recipes = random.sample(list(recipe_ids), 5)  # random recipes
 
-    user_vector = merge_to1_vector(ingr_vectors)
+    ingr_vectors = []
+    for x in user_recipes:
+        ingr_vectors.append(get_recipe_ingr_from_db(con, x))
+    user_recipes_ingrs = [x[0] for x in ingr_vectors]
+    user_vector = merge_to1_vector(user_recipes_ingrs)
+
     recipes_list = get_all_recipes(con)
 
-    jaccard_top5 = jaccard_get5(user_vector, 0)
-    pearson_top5 = []
-    hamming_top5 = []
+    jaccard_top5 = get5_by_method(user_vector, recipes_list, jaccard_similarity)
+    hamming_top5 = get5_by_method(user_vector, recipes_list, hamming_distance)
+    cossine_top5 = get5_by_method(user_vector, recipes_list, cossine_distance)
 
     print('Jaccard top 5: ')
-    print(f'  1){jaccard_top5[0]}\n  2){jaccard_top5[1]}\n  3){jaccard_top5[2]}\n  4){jaccard_top5[3]}\n  5){jaccard_top5[4]}\n')
+    print(f'  1){jaccard_top5[0].recipe_id}\n  2){jaccard_top5[1].recipe_id}\n  3){jaccard_top5[2].recipe_id}\n  4){jaccard_top5[3].recipe_id}\n  5){jaccard_top5[4].recipe_id}\n')
     print('Pearson top 5: ')
-    print(f'  1){pearson_top5[0]}\n  2){pearson_top5[1]}\n  3){pearson_top5[2]}\n  4){pearson_top5[3]}\n  5){pearson_top5[4]}\n')
+    print(f'  1){cossine_top5[0].recipe_id}\n  2){cossine_top5[1].recipe_id}\n  3){cossine_top5[2].recipe_id}\n  4){cossine_top5[3].recipe_id}\n  5){cossine_top5[4].recipe_id}\n')
     print('Hamming top 5: ')
-    print(f'  1){hamming_top5[0]}\n  2){hamming_top5[1]}\n  3){hamming_top5[2]}\n  4){hamming_top5[3]}\n  5){hamming_top5[4]}\n')
+    print(f'  1){hamming_top5[0].recipe_id}\n  2){hamming_top5[1].recipe_id}\n  3){hamming_top5[2].recipe_id}\n  4){hamming_top5[3].recipe_id}\n  5){hamming_top5[4].recipe_id}\n')
+
 
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/
