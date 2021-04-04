@@ -1,0 +1,89 @@
+<div>
+        User Recipes
+        <table class="centered thick-border">
+                <tr>
+                        <th>#</th>
+                        <th>Name</th>
+                        <th>Ingredients</th>
+                </tr>
+                {% for item in rec_list %}
+                        <tr>
+                                <td>{{ item.id }}</td>
+                                <td>{{ item.name }}</td>
+                                <td>{{ item.ingredients }}</td>
+                        </tr>
+                {% endfor %}
+        </table>
+</div>
+
+<br/>
+<br/>
+<br/>
+
+<div>
+        {{ sims[0] }}
+        <table class="centered thick-border">
+                <tr>
+                        <th>#</th>
+                        <th>Name</th>
+                        <th>%</th>
+                        <th>Ingredients</th>
+                </tr>
+                {% for item in list_of_top5s[0] %}
+                        <tr>
+                                <td>{{ item.recipe_id }}</td>
+                                <td>{{ item.recipe_name }}</td>
+                                <td>{{ item.value }}</td>
+                                <td>{{ item.ingredients }}</td>
+                        </tr>
+                {% endfor %}
+        </table>
+</div>
+
+<br/>
+<br/>
+<br/>
+
+<div>
+        {{ sims[1] }}
+        <table class="centered thick-border">
+                <tr>
+                        <th>#</th>
+                        <th>Name</th>
+                        <th>%</th>
+                        <th>Ingredients</th>
+                </tr>
+                {% for item in list_of_top5s[1] %}
+                        <tr>
+                                <td>{{ item.recipe_id }}</td>
+                                <td>{{ item.recipe_name }}</td>
+                                <td>{{ item.value }}</td>
+                                <td>{{ item.ingredients }}</td>
+                        </tr>
+                {% endfor %}
+        </table>
+</div>
+
+<br/>
+<br/>
+<br/>
+
+<div>
+        {{ sims[2] }}
+        <table class="centered thick-border">
+                <tr>
+                        <th>#</th>
+                        <th>Name</th>
+                        <th>%</th>
+                        <th>Ingredients</th>
+                </tr>
+                {% for item in list_of_top5s[2] %}
+                        <tr>
+                                <td>{{ item.recipe_id }}</td>
+                                <td>{{ item.recipe_name }}</td>
+                                <td>{{ item.value }}</td>
+                                <td>{{ item.ingredients }}</td>
+                        </tr>
+                {% endfor %}
+        </table>
+</div>

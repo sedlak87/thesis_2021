@@ -10,6 +10,7 @@ from scipy.spatial import distance
 from sklearn.metrics import jaccard_score
 from itertools import chain
 
+
 INGR_COUNT = 8023
 
 def standardize(vector):
@@ -53,12 +54,9 @@ def hamming_distance(v1, v2):
 
 def get5_by_method(user_vector, db_recipes, method):
     jaccard_list = []
-    c = 0
     for db in db_recipes:
         obj = Similarity(db.id, method(db.ingr_vector, user_vector))
         jaccard_list.append(obj)
-        print(c)
-        c += 1
     jaccard_list.sort(key=lambda v: v.value, reverse=True)
     return jaccard_list
 
@@ -95,7 +93,7 @@ def get_recipe_ingr_from_db(con, id):
 def select_all_recipe_ingr_ids(con):
     cur = con.cursor()
     #  fixme momentalne vyberam mensiu vzorku receptov kvoli debugu
-    ingredients_ids = cur.execute(f"SELECT id, ingredient_ids FROM PP_RECIPES").fetchmany(5000)
+    ingredients_ids = cur.execute(f"SELECT id, ingredient_ids FROM PP_RECIPES").fetchmany(3000)
     return ingredients_ids
 
 
@@ -130,6 +128,16 @@ def merge_to1_vector(input_vectors):
         c += 1
     return result
 
+
+def get_ingrs(con):
+    cur = con.cursor()
+    cur.arraysize = 1000
+    ingredients_ids = cur.execute(f"SELECT ingredient_ids FROM PP_RECIPES").fetchall()
+    result = []
+    for i in ingredients_ids:
+        result.append(string_to_ingredient_ids(i[0]))
+    return result
+
 if __name__ == '__main__':
     con = sl.connect('test.db')
     print('Opening file: ' + sys.argv[1])
@@ -141,27 +149,15 @@ if __name__ == '__main__':
     with open(sys.argv[1], 'rb') as p_f:
         ingredient_ids = pickle.load(p_f).id.unique()
 
-    recipe_ids = get_recipe_ids_from_db(con)
-    user_recipes = random.sample(list(recipe_ids), 5)  # random recipes
+    with open(sys.argv[1], 'rb') as p_f:
+        loaded = pickle.load(p_f)
 
-    ingr_vectors = []
-    for x in user_recipes:
-        ingr_vectors.append(get_recipe_ingr_from_db(con, x))
-    user_recipes_ingrs = [x[0] for x in ingr_vectors]
-    user_vector = merge_to1_vector(user_recipes_ingrs)
-
-    recipes_list = get_all_recipes(con)
-
-    jaccard_top5 = get5_by_method(user_vector, recipes_list, jaccard_similarity)
-    hamming_top5 = get5_by_method(user_vector, recipes_list, hamming_distance)
-    cossine_top5 = get5_by_method(user_vector, recipes_list, cossine_distance)
-
-    print('Jaccard top 5: ')
-    print(f'  1){jaccard_top5[0].recipe_id}\n  2){jaccard_top5[1].recipe_id}\n  3){jaccard_top5[2].recipe_id}\n  4){jaccard_top5[3].recipe_id}\n  5){jaccard_top5[4].recipe_id}\n')
-    print('Pearson top 5: ')
-    print(f'  1){cossine_top5[0].recipe_id}\n  2){cossine_top5[1].recipe_id}\n  3){cossine_top5[2].recipe_id}\n  4){cossine_top5[3].recipe_id}\n  5){cossine_top5[4].recipe_id}\n')
-    print('Hamming top 5: ')
-    print(f'  1){hamming_top5[0].recipe_id}\n  2){hamming_top5[1].recipe_id}\n  3){hamming_top5[2].recipe_id}\n  4){hamming_top5[3].recipe_id}\n  5){hamming_top5[4].recipe_id}\n')
+    ingrs_rows = get_ingrs(con)
+    counts = [0] * INGR_COUNT
+    for a in ingrs_rows:
+        for b in a:
+            counts[b] += 1
+    print('test')
 
 
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/
