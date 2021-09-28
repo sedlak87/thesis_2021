@@ -10,8 +10,10 @@ from scipy.spatial import distance
 from sklearn.metrics import jaccard_score
 from itertools import chain
 
+from dto.Recipe import Recipe
 
 INGR_COUNT = 8023
+
 
 def standardize(vector):
     result = []
@@ -20,65 +22,6 @@ def standardize(vector):
     return result
 
 
-class Similarity:
-    def __init__(self, recipe_id, value):
-        self.recipe_id = recipe_id
-        self.value = value
-
-
-class Recipe:
-  def __init__(self, id, ingr_vector):
-      self.id = id
-      self.ingr_vector = ingr_vector
-
-  def get_vector(self):
-    return self.ingr_vector
-
-
-class User:
-    def __init__(self):
-        pass
-
-    def get_vector(self):
-        print("Hello my name is " + self.name)
-
-
-
-def jaccard_similarity(v1, v2):
-    return jaccard_score(v1, v2)
-
-
-def hamming_distance(v1, v2):
-    return distance.hamming(v1, v2)
-
-
-def get5_by_method(user_vector, db_recipes, method):
-    jaccard_list = []
-    for db in db_recipes:
-        obj = Similarity(db.id, method(db.ingr_vector, user_vector))
-        jaccard_list.append(obj)
-    jaccard_list.sort(key=lambda v: v.value, reverse=True)
-    return jaccard_list
-
-
-def cossine_distance(v1, v2):
-    return distance.cosine(v1, v2)
-
-
-def kulzinsky(vector_1, vector_2):
-    print('test')
-
-
-def dice_sim(vector_1, vector_2):
-    print('test')
-
-
-def manhattan_sim(vector_1, vector_2):
-    print('test')
-
-
-def russel_rao_sim(vector_1, vector_2):
-    print('test')
 
 def string_to_ingredient_ids(string):
     result = string.strip("[]")
