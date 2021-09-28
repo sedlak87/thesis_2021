@@ -5,7 +5,7 @@ from sqlalchemy import Column, Integer, Float, Date
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-
+import random
 from utils import *
 from pony.orm import *
 
@@ -25,12 +25,25 @@ class RAW_RECIPES(db.Entity):
     ingredients = Required(str)
 
 
+@db_session
+def get_user_vector():
+    random_ids = random.sample(range(0, 8023), 5)
+    data = list(select(p.name for p in RAW_RECIPES))
+    for i in random.choices(data, k=5):
+        print(i)
+
+
 if __name__ == '__main__':
     db.generate_mapping(create_tables=True)
-    with db_session:
-        data = RAW_RECIPES.select(lambda p: p.id < 500)
-        for i in data:
-            print("[ID] = " + str(i.id) + "| [name] = " + i.name)
+    get_user_vector()
+
+
+# if __name__ == '__main__':
+#     db.generate_mapping(create_tables=True)
+#     with db_session:
+#         data = RAW_RECIPES.select(lambda p: p.id < 500)
+#         for i in data:
+#             print("[ID] = " + str(i.id) + "| [name] = " + i.name)
 
 
 # if __name__ == '__main__':
