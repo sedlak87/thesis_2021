@@ -5,13 +5,13 @@ from sklearn.metrics import jaccard_score
 
 def get_ingredient_ids(ingredient_ids_string):
     stripped_brackets = ingredient_ids_string.strip('[]')
-    return list(map(int, stripped_brackets.split(',')))
+    return set(map(int, stripped_brackets.split(',')))
 
 #def get_recipes(input)
 
 
 def jaccard_similarity(v1, v2):
-    return jaccard_score(v1, v2)
+    return distance.jaccard(v1, v2)
 
 
 def hamming_distance(v1, v2):
@@ -39,5 +39,28 @@ def russel_rao_distance(vector_1, vector_2):
 
 
 def euclidean_distance(vector_1, vector_2):
-    return abs(distance.euclidean(vector_1, vector_2))
+    return distance.euclidean(vector_1, vector_2)
 
+
+def sm_distance(vector_1, vector_2):
+    return distance.sokalmichener(vector_1, vector_2)
+
+
+def corr(vector_1, vector_2):
+    return distance.correlation(vector_1, vector_2)
+
+
+def bray_c_distance(vector_1, vector_2):
+    return distance.braycurtis(vector_1, vector_2)
+
+
+def yule_distance(vector_1, vector_2):
+    return distance.yule(vector_1, vector_2)
+
+
+def manhattan_distance(vector_1, vector_2):
+    return distance.cityblock(vector_1, vector_2)
+
+
+def sokal(vector_1, vector_2):
+    return distance.sokalsneath(vector_1, vector_2)

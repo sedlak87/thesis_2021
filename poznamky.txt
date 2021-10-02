@@ -1,0 +1,7 @@
+Jaccard, Hamming je v pohode (dava recepty a top 5 maju ine hodnoty)
+vziat recepty ktore maju viac ako 10 ingrediencii
+
+- uprava dat
+	: len take recepty kde je aspon X ingrediencii
+	: vyhodit top X najpouzivanejsie ingrediencie
+	: 
