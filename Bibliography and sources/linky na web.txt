@@ -1,1 +1,9 @@
 https://heartbeat.comet.ml/recommender-systems-with-python-part-i-content-based-filtering-5df4940bd831
+
+https://www.wired.com/story/how-grubhub-analyzed-4000-dishes-to-predict-your-next-order/
+
+https://www.kaggle.com/shuyangli94/food-com-recipes-and-user-interactions/discussion/118716
+
+https://docs.ponyorm.org/queries.html
+
+https://myscp.onlinelibrary.wiley.com/doi/full/10.1016/j.jcps.2011.10.002
