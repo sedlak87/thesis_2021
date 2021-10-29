@@ -9,14 +9,16 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 import random
-from flask import Flask, render_template
+from flask import Flask, render_template, request, redirect, url_for, jsonify
 from dto.Recipe import Recipe
 from dto.Similarity import Similarity
 from utils import *
+from flask_paginate import Pagination, get_page_parameter
 import os
 import csv
 from pony.orm import *
 import numpy as np
+
 
 db = Database(provider='sqlite', filename='../archive/backup/test.db')
 app = Flask(__name__, static_url_path='')
@@ -24,6 +26,9 @@ app.static_folder = 'static'
 INGR_COUNT = 8023
 POPULAR_INGR = {6270, 840, 6906, 5006, 7655, 5319, 800, 6276, 590, 4987}
 
+class RECIPE_INGREDIENTS(db.Entity):
+    id = PrimaryKey(int)
+    ingredient_ids = Required(str)
 
 class PP_RECIPES(db.Entity):
     id = PrimaryKey(int, auto=True)
@@ -111,13 +116,13 @@ def read_recipe_file(file, user_vector, rec_list):
     return render_template("user_recipes.html", rec_list=rec_list, sims=sims, list_of_top5s=list_of_top5s)
 
 
-@app.route("/")
+@app.route("/test")
 def index():
     with db_session:
         all_recipes = set(select(p.id for p in PP_RECIPES))
         pick_ids = random.sample(all_recipes, k=10)
         u_v = get_user_vector(pick_ids)
-        recipes = set(select((p.id, p.ingredient_ids) for p in PP_RECIPES)[:50000])
+        recipes = set(select((p.id, p.ingredient_ids) for p in PP_RECIPES)[:1000])
         create_recipe_vectors_file(recipes)
         user_p = []
         for xxx in pick_ids:
@@ -126,8 +131,24 @@ def index():
         return read_recipe_file(os.getcwd() + "/test/Names.json", u_v, user_p)
 
 
+# @app.route('/')
+# @db_session
+# def test():
+#     search = False
+#     q = request.args.get('q')
+#     if q:
+#         search = True
+#     page = request.args.get(get_page_parameter(), type=int, default=1)
+#     total = len(select(p.id for p in RAW_RECIPES))
+#     recipes = list(select(p for p in RAW_RECIPES).page(page))
+#     pagination = Pagination( page=page, total=total, search=search, record_name='recipes')
+#     return render_template('recipes.html', recipes=recipes, pagination=pagination)
+
 if __name__ == '__main__':
-    app.run(host="127.0.0.1", port=8080, debug=True)
+    # app.run(host="127.0.0.1", port=8080, debug=True)
+    with db_session:
+        data = list(select(p.id for p in RECIPE_INGREDIENTS))
+        print(data)
 
 
 # if __name__ == '__main__':
@@ -191,13 +212,11 @@ if __name__ == '__main__':
 #     print("sokal Viac: " + str(sokal(x, y)))
 #     print("sokal Menej: " + str(sokal(a, b)))
 
-#if __name__ == '__main__':
+# if __name__ == '__main__':
 #    engine = create_engine('sqlite:///archive/csv_test.db')
 #   Base.metadata.create_all(engine)
 #
-   # Create the session
+# Create the session
 #    session = sessionmaker()
 #    session.configure(bind=engine)
 #    s = session()
-
-
