@@ -11,7 +11,7 @@ from scipy.spatial import distance
 from sklearn.metrics import jaccard_score
 from itertools import chain
 
-from dto.Recipe import Recipe
+from dto.recipe_ingredients_dao import Recipe
 from dto.Similarity import Similarity
 from utils import get_ingredient_ids
 

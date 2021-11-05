@@ -1,13 +1,15 @@
 # Utility methods
 from scipy.spatial import distance
-from sklearn.metrics import jaccard_score
 
 
-def get_ingredient_ids(ingredient_ids_string):
-    stripped_brackets = ingredient_ids_string.strip('[]')
-    return set(map(int, stripped_brackets.split(',')))
-
-#def get_recipes(input)
+def get_user_vector_mock():
+    random_ingredients = [1, 2, 3, 4, 5, 6, 7, 8]  # ziskam X oblubenych ingrediencii
+    zero_vector = [0] * 6227
+    # for a in random_ingredients:
+    #     #recipe = get_ingredient_ids(a)
+    #     for ingredient_id in []:
+    #         zero_vector[ingredient_id] = 1
+    return zero_vector
 
 
 def jaccard_similarity(v1, v2):

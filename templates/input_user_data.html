@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>This is where user pick recipes</h1>
+<br/>
+<h1>Search for recipes</h1>
+<form method="POST">
+    {{ form.hidden_tag() }}
+
+    {{ form.search_text(class="form-control") }}
+    <br/>
+    {{ form.search_submit(class="btn btn-primary") }}
+    <br/>
+    {% if form.recipes %}
+        <table class="table table-bordered">
+          <thead>
+            <tr>
+              <th scope="col">#</th>
+              <th scope="col">Name</th>
+              <th scope="col">Ingredients</th>
+              <th scope="col">Add</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for r in form.recipes %}
+                <tr>
+                    <td>{{ r.id }}</td>
+                    <td>{{ r.name }}</td>
+                    <td>{{ r.ingredients }}</td>
+                    <td>
+                        <input type="submit" value="Add" name="action1"/>
+                    </td>
+                </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+    {% endif %}
+
+    <a class="btn btn-primary" href="{{ url_for('show_metrics') }}" role="button">Recommend</a>
+
+</form>
+{% endblock %}
+

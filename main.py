@@ -11,7 +11,7 @@ from wtforms.validators import DataRequired
 from dto.Similarity import Similarity
 from dto.Recipe import Recipe
 
-from database.db_helper import RAW_RECIPES
+from database.db_helper import RAW_RECIPES, Recipe_IngredientVector_NF
 from prepare_db import fix_db
 
 
@@ -80,14 +80,14 @@ def recipe_search():
 
 
 # Return top 5 Recipes by metric provided on input calculated with user_vector
+@db_session
 def get_top5_recipe_vectors_metric(user_vector, method, reverse=True) -> List[Similarity]:
     top_5_metric_recipes = []
-    recipe_data = [Recipe(1, 'Burgir', None, [0]*6227)]
     try:
-        for recipe in recipe_data:
-            obj = Similarity(recipe.id, recipe.name, recipe.ingredients,
-                             method(recipe.ingr_vector, user_vector))
-            top_5_metric_recipes.append(obj)
+        for recipe in list(select(r for r in Recipe_IngredientVector_NF)):
+            ingredient_vector_int = recipe.IngredientVector.split(',')
+            recipe_metric_value = Similarity(recipe.RecipeId, None, None, method(ingredient_vector_int, user_vector))
+            top_5_metric_recipes.append(recipe_metric_value)
         top_5_metric_recipes.sort(key=lambda v: v.value, reverse=reverse)
     except Error:
         print(Error)
@@ -98,8 +98,6 @@ def get_top5_recipe_vectors_metric(user_vector, method, reverse=True) -> List[Si
 def show_metrics():
     form = MetricListForm()
     user_vector = get_user_vector_mock()
-
-
 
     jacc = get_top5_recipe_vectors_metric(user_vector, jaccard_similarity)
     return render_template("metrics_recommendations.html", form=form)

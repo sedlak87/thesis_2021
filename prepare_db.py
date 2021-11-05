@@ -42,6 +42,7 @@ def fix_db():
         df = pickle.load(p_f)
         if int(sys.argv[2]) == 1:  # remove rare ingredients
             print("Removing ingredients appearing in less than 3 recipes")
+            list(select(e for e in R))
             max_three_times = df.query(f"count <= {RARE_RECIPE_COUNT}")
             rare_ingredient_ids = set(max_three_times['id'])
             invalidate_ingredients(rare_ingredient_ids)
@@ -61,11 +62,12 @@ def fix_db():
         if int(sys.argv[5]) == 1:
             print("Creating table with recipe ID and ingredient vector")
             recipes = set(select(r.RecipeId for r in RECIPE_INGREDIENTS_NF if r.Valid == 1))
-            totalIngredients = select(r.id for r in Ingredients_NF).count()
-            ingredient_vector = [0]*totalIngredients
+            total_ingredients = select(r.id for r in Ingredients_NF).count()
             for r in recipes:
+                ingredient_vector = [0] * total_ingredients
                 recipe_ingredient_values = list(select(ri.IngredientId for ri in RECIPE_INGREDIENTS_NF if ri.RecipeId == r))
-                recipe_ingredient_ids = list(select(i for i in Ingredients_NF if i.IngredientValue in recipe_ingredient_values))
-                for ingr_id in recipe_ingredient_ids:
-                    ingredient_vector[ingr_id] = 1
-                Recipe_IngredientVector_NF(RecipeId=r, IngredientVector=ingredient_vector)
+                recipe_ingredients = list(select(i for i in Ingredients_NF if i.IngredientValue in recipe_ingredient_values))
+                for ingr in recipe_ingredients:
+                    ingredient_vector[ingr.id] = 1
+                ingredient_vector_string = ','.join([str(i) for i in ingredient_vector])
+                Recipe_IngredientVector_NF(RecipeId=r, IngredientVector=ingredient_vector_string)

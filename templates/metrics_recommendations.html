@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h1> Here are possible recommendations </h1>
+    <br/>
+
+    <form method="POST">
+        {% for metric in form.metrics %}
+            {{ metric.name }}
+            <table class="table table-bordered">
+              <thead>
+                <tr>
+                  <th scope="col">User Rating</th>
+                  <th scope="col">Recipe Name</th>
+                  <th scope="col">Ingredients</th>
+                  <th scope="col">Value</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for r in metric.recipes %}
+                    <tr>
+                        <td><input type="text" name="Field_name" /></td>
+                        <td>{{ r.name }}</td>
+                        <td>{{ r.ingredients }}</td>
+                        <td>{{ r.decimal_value }}</td>
+                    </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+        {% endfor %}
+    </form>
+{% endblock %}

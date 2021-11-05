@@ -10,7 +10,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 import random
 from flask import Flask, render_template, request, redirect, url_for, jsonify
-from dto.Recipe import Recipe
+from dto.recipe_ingredients_dao import Recipe
 from dto.Similarity import Similarity
 from utils import *
 from flask_paginate import Pagination, get_page_parameter
@@ -25,6 +25,7 @@ app = Flask(__name__, static_url_path='')
 app.static_folder = 'static'
 INGR_COUNT = 8023
 POPULAR_INGR = {6270, 840, 6906, 5006, 7655, 5319, 800, 6276, 590, 4987}
+
 
 class RECIPE_INGREDIENTS(db.Entity):
     id = PrimaryKey(int)
@@ -144,11 +145,11 @@ def index():
 #     pagination = Pagination( page=page, total=total, search=search, record_name='recipes')
 #     return render_template('recipes.html', recipes=recipes, pagination=pagination)
 
-if __name__ == '__main__':
-    # app.run(host="127.0.0.1", port=8080, debug=True)
-    with db_session:
-        data = list(select(p.id for p in RECIPE_INGREDIENTS))
-        print(data)
+# if __name__ == '__main__':
+#     # app.run(host="127.0.0.1", port=8080, debug=True)
+#     with db_session:
+#         data = list(select(p.id for p in RECIPE_INGREDIENTS))
+#         print(data)
 
 
 # if __name__ == '__main__':

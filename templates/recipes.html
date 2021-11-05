@@ -2,13 +2,29 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Title</title>
+  <link rel= "stylesheet" type= "text/css" href= "style.css">
 </head>
 <body>
 
-    {% for i in your_list %}
-        <p>{{ i }} </p>
-    {% endfor %}
+    {{ pagination.info }}
+    {{ pagination.links }}
+    <table>
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Name</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for user in recipes %}
+          <tr>
+            <td>{{ loop.index + pagination.skip }}</td>
+            <td>{{ user.name }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {{ pagination.links }}
 
 </body>
 </html>
