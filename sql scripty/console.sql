@@ -3,10 +3,11 @@ create table RECIPE_INGREDIENTS_NF
 	ID INTEGER
 		constraint PK_ID
 			primary key autoincrement,
-	RecipeID INTEGER UNIQUE not null,
-	IngredientID INTEGER not null,
-	Valid INTEGER not null default 1
+	RecipeID INTEGER not null,
+	IngredientID INTEGER not null
 );
+
+SELECT * FROM RECIPE_INGREDIENTS_NF;
 
 -- Now add the clustered index
 CREATE INDEX IX_RecipeID ON RECIPE_INGREDIENTS_NF (RecipeID);
@@ -14,7 +15,7 @@ CREATE INDEX IX_RecipeID ON RECIPE_INGREDIENTS_NF (RecipeID);
 SELECT * FROM Ingredients_NF
 WHERE IngredientValue IN (SELECT IngredientID FROM RECIPE_INGREDIENTS_NF where RecipeID=38);
 
-SELECT * FROM Ingredients_NF
+SELECT * FROM RECIPE_INGREDIENTS_NF;
 
 SELECT count(DISTINCT RecipeID) FROM RECIPE_INGREDIENTS_NF where Valid=0;
 
@@ -26,12 +27,10 @@ SELECT * FROM PP_RECIPES WHERE id=488260;
 -- Total recipes 178263
 SELECT count(distinct IngredientID) FROM RECIPE_INGREDIENTS_NF where valid=1;
 
-SELECT * FROM RECIPE_INGREDIENTS_NF;
+SELECT * FROM RECIPE_INGREDIENTS;
 
 --DROP TABLE RECIPE_INGREDIENTS_NF;
 
+SELECT * FROM Recipe_IngredientVector
 
-SELECT * FROM RAW_RECIPES where ingredients like '%shredded three cheese%'
-
---DELETE FROM RECIPE_INGREDIENTS_NF;
 

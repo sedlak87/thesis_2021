@@ -5,6 +5,9 @@ class Similarity:
         self._ingredients = ingredients
         self._value = value
 
+    def get_recipe_id(self):
+        return self._recipe_id
+
     def get_recipe_name(self):
         return self._recipe_name
 

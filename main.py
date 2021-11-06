@@ -2,6 +2,7 @@ import pickle
 import sys
 from random import random
 
+import rbo
 from pony.orm import *
 from flask import Flask, render_template, request
 from flask_wtf import FlaskForm
@@ -11,13 +12,13 @@ from wtforms.validators import DataRequired
 from dto.Similarity import Similarity
 from dto.Recipe import Recipe
 
-from database.db_helper import RAW_RECIPES, Recipe_IngredientVector_NF
+from database.db_helper import RAW_RECIPES, Recipe_IngredientVector, RECIPE_INGREDIENTS_NF
 from prepare_db import fix_db
 
 
 __author__ = "Matúš Sedlák"
 
-from utils import get_user_vector_mock, jaccard_similarity
+from utils import *
 
 app = Flask(__name__, static_url_path='')
 app.config['SECRET_KEY'] = "password"
@@ -81,26 +82,48 @@ def recipe_search():
 
 # Return top 5 Recipes by metric provided on input calculated with user_vector
 @db_session
-def get_top5_recipe_vectors_metric(user_vector, method, reverse=True) -> List[Similarity]:
-    top_5_metric_recipes = []
+def get_top_x_recipe_vectors_metric(x, user_vector, f, reverse=False) -> List[Similarity]:
+    top_x_metric_recipes = []
     try:
-        for recipe in list(select(r for r in Recipe_IngredientVector_NF)):
-            ingredient_vector_int = recipe.IngredientVector.split(',')
-            recipe_metric_value = Similarity(recipe.RecipeId, None, None, method(ingredient_vector_int, user_vector))
-            top_5_metric_recipes.append(recipe_metric_value)
-        top_5_metric_recipes.sort(key=lambda v: v.value, reverse=reverse)
+        recipes = list(select(r for r in Recipe_IngredientVector if r.valid == 1))
+        for recipe in recipes:
+            ingredient_vector_int = [int(s) for s in recipe.IngredientVector.split(',')]
+            recipe_name = select(r.name for r in RAW_RECIPES if r.id == recipe.RecipeId).first()
+            recipe_metric_value = Similarity(recipe.RecipeId, recipe_name, None, f(ingredient_vector_int, user_vector))
+            top_x_metric_recipes.append(recipe_metric_value)
+        top_x_metric_recipes.sort(key=lambda v: (v.get_value(), v.get_recipe_id()), reverse=reverse)
     except Error:
         print(Error)
-    return top_5_metric_recipes[:20]
+    return top_x_metric_recipes[:x]
+
+
 
 
 @app.route("/metrics")
 def show_metrics():
     form = MetricListForm()
     user_vector = get_user_vector_mock()
+    metrics = ['Jaccard', 'Hamming', 'Cossine', 'Kulzinsky', 'Dice', 'Rogers', 'Russ R', 'Euclid.']
+    data = []
+    for name, f in metric_dic.items():
+        # name = 'Jaccard'
+        # f = function(a,b)
+        metric_results = get_top_x_recipe_vectors_metric(
+            x=10, user_vector=user_vector, f=f)
+        data.append({'name': name, 'data': metric_results})
 
-    jacc = get_top5_recipe_vectors_metric(user_vector, jaccard_similarity)
-    return render_template("metrics_recommendations.html", form=form)
+    return render_template("metrics_recommendations.html", data=data)
+
+
+@app.route("/result")
+def compare_rankings():
+    S = [1, 2, 2]
+    T = [1, 3, 2]
+
+    res = rbo.RankingSimilarity(S,T).rbo()
+    print(res)
+
+    return "<h1> TEST </h1>"
 
 
 if __name__ == '__main__':

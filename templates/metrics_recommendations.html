@@ -1,32 +1,46 @@
 {% extends 'base.html' %}
 
 {% block content %}
-    <h1> Here are possible recommendations </h1>
-    <br/>
-
-    <form method="POST">
-        {% for metric in form.metrics %}
+<h1> Here are possible recommendations </h1><br/>
+<div class="container">
+    <form>
+        {% for metric in data %}
             {{ metric.name }}
             <table class="table table-bordered">
               <thead>
                 <tr>
-                  <th scope="col">User Rating</th>
-                  <th scope="col">Recipe Name</th>
-                  <th scope="col">Ingredients</th>
-                  <th scope="col">Value</th>
+                    <th scope="col">ID</th>
+                    <th scope="col">Value</th>
+                    <th scope="col">Recipe Name</th>
+                    <!--<th scope="col">Ingredients</th>-->
                 </tr>
               </thead>
               <tbody>
-                {% for r in metric.recipes %}
+                {% for r in metric.data %}
                     <tr>
-                        <td><input type="text" name="Field_name" /></td>
-                        <td>{{ r.name }}</td>
-                        <td>{{ r.ingredients }}</td>
-                        <td>{{ r.decimal_value }}</td>
+                        <td>{{ r._recipe_id }}</td>
+                        <td>{{ r._value }}</td>
+                        <td>{{ r._recipe_name }}</td>
+                        <!--<td>{{ r.ingredients }}</td>-->
                     </tr>
                 {% endfor %}
               </tbody>
             </table>
         {% endfor %}
     </form>
+</div>
 {% endblock %}
+
+<div class="container">
+  <div class="row">
+    <div class="col align-self-start">
+      One of three columns
+    </div>
+    <div class="col align-self-center">
+      One of three columns
+    </div>
+    <div class="col align-self-end">
+      One of three columns
+    </div>
+  </div>
+</div>
