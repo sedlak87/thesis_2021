@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<ui>
+{% for d in data %}
+    <li> {{ d.get_metric_name() }} : {{ d.get_value() }} </li>
+{% endfor %}
+</ui>
+
+<br/>
+<h1> Here are the results </h1><br/>
+<div class="container">
+    {% for metric in top_metrics_data %}
+        <b>{{ metric._name }}</b>
+        <table class="table table-bordered">
+          <thead>
+            <tr>
+                <th scope="col">Rank</th>
+                <th scope="col">ID</th>
+                <th scope="col">Name</th>
+                <th scope="col">Ingredients</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for r in metric._data %}
+                <tr>
+                    <td>{{ r._rank }}.</td>
+                    <td>{{ r._recipe._id }}</td>
+                    <td>{{ r._recipe._name }}</td>
+                    <td>{{ r._recipe._ingredients }}</td>
+                </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+    {% endfor %}
+</div>
+
+{% endblock %}

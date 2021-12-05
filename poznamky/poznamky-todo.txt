@@ -1,0 +1,17 @@
+1) offline statistika 
+ - otestujem to viackrat a tie cisla od algoritmov, z nich spravim statistiku
+	- min , max ,priemer, median?, odchylka
+ - scalability - bud dat do zaveru alebo k offline statistike 
+
+User studies - 
+1) precision a okomentovat
+2) serendipity opytat sa uzivatela ci tam bolo daco nove
+
+- general feedback od uzivatelov od 1-10
+
+- ku implementacii:
+	- okomentovat co je moj kod a co je ukradnute
+
+
+- ku obrazkom dat citaciu do labelu priamo
+- opravit vsetky riadky kde preteka text za okraj!

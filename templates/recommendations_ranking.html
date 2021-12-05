@@ -1,0 +1,87 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>User Input:</h1>
+<table class="table table-bordered">
+    <thead>
+        <th>#</th>
+        <th>Recipe name</th>
+    </thead>
+    <tbody>
+    {% for u in user_data.get_recipes() %}
+        <tr>
+            <td>{{ u[0] }}</td>
+            <td>{{ u[1] }}</td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
+
+<div class="container">
+
+</div>
+
+{% for metric in data %}
+<div class="container">
+    <b>{{ metric._name }} &nbsp</b> : {% for r in metric._data %} {{r._recipe._id}},  {% endfor %}
+</div>
+{% endfor %}
+
+<br/>
+
+<div class="container">
+    <form method="POST" action="{{ url_for('compare_rankings') }}">
+        {{ form.hidden_tag() }}
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Rank</th>
+                <th>Name</th>
+                <th>Ingredients</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for f in form.ranked_recipes %}
+        <tr>
+            <td>{{ f.recipe_id(class="form-control", readonly=true) }}</td>
+            <td>{{ f.rank }}</td>
+            <td>{{ f.recipe_name(class="form-control", readonly=true) }}</td>
+            <td>{{ f.ingredients(class="form-control", readonly=true) }}</td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+        <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
+</div>
+
+<h1> Here are possible recommendations </h1><br/>
+<div class="container">
+    {% for metric in data %}
+        <b>{{ metric._name }}</b>
+        <table class="table table-bordered">
+          <thead>
+            <tr>
+                <th scope="col">Rank</th>
+                <th scope="col">ID</th>
+                <th scope="col">Value</th>
+                <th scope="col">Recipe Name</th>
+                <!--<th scope="col">Ingredients</th>-->
+            </tr>
+          </thead>
+          <tbody>
+            {% for r in metric._data %}
+                <tr>
+                    <td>{{ r._rank }}.</td>
+                    <td>{{ r._recipe._id }}</td>
+                    <td>{{ r._value }}</td>
+                    <td>{{ r._recipe._name }}</td>
+                    <!--<td>{{ r.ingredients }}</td>-->
+                </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+    {% endfor %}
+</div>
+{% endblock %}
